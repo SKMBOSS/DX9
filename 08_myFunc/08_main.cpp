@@ -150,11 +150,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 
 }
 
-CUSTOMVECTOR vec1 = { 150.0f, 50.0f, 0.5f, 0.0f };
-CUSTOMVECTOR vec2 = { 250.0f, 250.0f, 0.5f, 0.0f };
-CUSTOMVECTOR vec3 = { 50.0f, 250.0f, 0.5f, 0.0f };
+CUSTOMVECTOR vec1 = { 0.0f, 0.0f, 0.5f, 1.0f };
+CUSTOMVECTOR vec2 = { 100.0f, 100.0f, 0.5f, 1.0f };
+CUSTOMVECTOR vec3 = { -100.0f, 100.0f, 0.5f, 1.0f };
 
 float fangle = 0.0f;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
@@ -167,22 +168,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_TIMER:
 		InvalidateRect(hWnd, NULL, TRUE); //화면을 갱신하기위해
-		//vec1 = MY_ROTARIONY(vec1, 0.1f);
+		vec1 = MY_ROTARIONY(vec1, 0.1f);
 		vec2 = MY_ROTARIONY(vec2, 0.1f);
 		vec3 = MY_ROTARIONY(vec3, 0.1f);
 
-		//vec1 = MY_TRANS_VECTOR(vec1, 0.1f, 0.0f, 0.0f);
-		//vec2 = MY_TRANS_VECTOR(vec2, 0.1f, 0.0f, 0.0f);
-		//vec3 = MY_TRANS_VECTOR(vec3, 0.1f, 0.0f, 0.0f);
 		return 0;
 	case WM_PAINT:
+	{
 		hdc = BeginPaint(hWnd, &ps);
-		MoveToEx(hdc, vec1.x, vec1.y, NULL);
-		LineTo(hdc, vec2.x, vec2.y);
-		LineTo(hdc, vec3.x, vec3.y);
-		LineTo(hdc, vec1.x, vec1.y);
+
+		CUSTOMVECTOR tVec1 = MY_TRANS_VECTOR(vec1, 650.1f, 100.0f, 0.0f);
+		CUSTOMVECTOR tVec2 = MY_TRANS_VECTOR(vec2, 650.1f, 100.0f, 0.0f);
+		CUSTOMVECTOR tVec3 = MY_TRANS_VECTOR(vec3, 650.1f, 100.0f, 0.0f);
+
+		MoveToEx(hdc, tVec1.x, tVec1.y, NULL);
+		LineTo(hdc, tVec2.x, tVec2.y);
+		LineTo(hdc, tVec3.x, tVec3.y);
+		LineTo(hdc, tVec1.x, tVec1.y);
 
 		EndPaint(hWnd, &ps);
+	}
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
