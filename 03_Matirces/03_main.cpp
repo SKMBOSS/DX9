@@ -139,7 +139,6 @@ void SetupMareices()
 
 	D3DXMATRIXA16 matProj;
 	D3DXMatrixPerspectiveFovLH(&matProj, D3DX_PI / 4, 1.0f, 1.0f, 100.0f);
-
 	g_pD3DDevice->SetTransform(D3DTS_PROJECTION, &matProj);
 }
 

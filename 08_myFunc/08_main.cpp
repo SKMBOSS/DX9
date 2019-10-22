@@ -117,6 +117,19 @@ CUSTOMVECTOR MY_ROTARIONZ(CUSTOMVECTOR vec, float radian)
 	return MATRIX_PRODUCT_VECTOR(rotationZ_Matrix, vec);
 }
 
+CUSTOMVECTOR MY_PROJECTION(CUSTOMVECTOR vec, float w, float h, float n, float f)
+{
+	CUSTOMMATIRX projection_Matrix;
+
+	projection_Matrix.a11 =  2 * n / w; 
+	projection_Matrix.a22 = 2 * n / h;
+	projection_Matrix.a33 = f / (f - n);
+	projection_Matrix.a34 = 1;
+	projection_Matrix.a43 = -(f/ (f - n));
+
+	return MATRIX_PRODUCT_VECTOR(projection_Matrix, vec);
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow)
 {
 	HWND hWnd;
@@ -150,9 +163,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmd
 
 }
 
-CUSTOMVECTOR vec1 = { 0.0f, 0.0f, 0.5f, 1.0f };
-CUSTOMVECTOR vec2 = { 100.0f, 100.0f, 0.5f, 1.0f };
-CUSTOMVECTOR vec3 = { -100.0f, 100.0f, 0.5f, 1.0f };
+CUSTOMVECTOR vec1 = { 0.0f, 0.0f, 0.0f, 1.0f };
+CUSTOMVECTOR vec2 = { 100.0f, 100.0f, 0.0f, 1.0f };
+CUSTOMVECTOR vec3 = { -100.0f, 100.0f, 0.0f, 1.0f };
 
 float fangle = 0.0f;
 
@@ -180,6 +193,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		CUSTOMVECTOR tVec1 = MY_TRANS_VECTOR(vec1, 650.1f, 100.0f, 0.0f);
 		CUSTOMVECTOR tVec2 = MY_TRANS_VECTOR(vec2, 650.1f, 100.0f, 0.0f);
 		CUSTOMVECTOR tVec3 = MY_TRANS_VECTOR(vec3, 650.1f, 100.0f, 0.0f);
+
+		tVec1 = MY_PROJECTION(tVec1, 10, 10, 10, 10);
+		tVec2 = MY_PROJECTION(tVec2, 10, 10, 10, 10);
+		tVec3 = MY_PROJECTION(tVec3, 10, 10, 10, 10);
 
 		MoveToEx(hdc, tVec1.x, tVec1.y, NULL);
 		LineTo(hdc, tVec2.x, tVec2.y);
