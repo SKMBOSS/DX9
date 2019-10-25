@@ -98,12 +98,15 @@ HRESULT InitVB()
 	CUSTOMVERTEX2 vertices[] =
 	{
 		{ -5, 50,0, 0,0,},
-		{  5, 50,0, 1,0, },
+		{  5,20,0, 1,1, },
 		{ -5,20,0, 0,1, },
-		{  5,20,0, 1,1, }
+
+		{ -5, 50,0, 0,0,},
+		{  5, 50,0, 1,0, },
+		{  5,20,0, 1,1, },
 	};
 
-	if (FAILED(g_pd3dDevice->CreateVertexBuffer(4 * sizeof(CUSTOMVERTEX2), 0, D3DFVF_CUSTOMVERTEX2, D3DPOOL_DEFAULT,
+	if (FAILED(g_pd3dDevice->CreateVertexBuffer(6 * sizeof(CUSTOMVERTEX2), 0, D3DFVF_CUSTOMVERTEX2, D3DPOOL_DEFAULT,
 		&g_pVB2, NULL)))
 		return E_FAIL;
 
@@ -345,26 +348,16 @@ VOID Animate()
 	/// 0 ~ 2PI 까지(0~360도) 값을 변화시킴 Fixed Point기법 사용
 	DWORD d = GetTickCount() % ((int)((D3DX_PI * 2) * 1000));
 	/// Y축 회전행렬
-	//	D3DXMatrixRotationY( &g_matAni, d / 1000.0f );
+	//D3DXMatrixRotationY( &g_matAni, d / 1000.0f );
 	D3DXMatrixIdentity(&g_matAni);
 	D3DXMatrixIdentity(&g_matAni2);
-	auto mat = *ZCamera::GetInstance()->GetBillMatrix();
+
+	g_matAni2._11 = ZCamera::GetInstance()->GetBillMatrix()->_11;
+	g_matAni2._13 = ZCamera::GetInstance()->GetBillMatrix()->_13;
+	g_matAni2._31 = ZCamera::GetInstance()->GetBillMatrix()->_31;
+	g_matAni2._33 = ZCamera::GetInstance()->GetBillMatrix()->_33;
+
 	
-	mat._22 = 1;
-	mat._23 = 1;
-	mat._32 = 1;
-	mat._33 = 1;
-
-	g_matAni2 = g_matAni2 * mat;
-
-	//g_matAni2._11 = ZCamera::GetInstance()->GetBillMatrix()->_11;
-	//g_matAni2._13 = ZCamera::GetInstance()->GetBillMatrix()->_13;
-	//g_matAni2._31 = ZCamera::GetInstance()->GetBillMatrix()->_31;
-	//g_matAni2._33 = ZCamera::GetInstance()->GetBillMatrix()->_33;
-	//D3DXMatrixInverse(&g_matAni2, NULL, &g_matAni2);
-
-
-
 	LogFPS();
 
 	SetupLights();
@@ -419,7 +412,7 @@ void Render()
 		g_pd3dDevice->SetStreamSource(0, g_pVB2, 0, sizeof(CUSTOMVERTEX2)); // 정점세팅
 		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX2);
 		//g_pd3dDevice->SetIndices(g_pIB2);
-		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2);
 		
 
 		g_pd3dDevice->SetTexture(0, g_pTexDiffuse);
