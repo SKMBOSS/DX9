@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{1CD4CCE5-9488-4B7F-AF48-0EBDB96F96E7}</ProjectGuid>
+    <ProjectGuid>{D9856DDC-D1C4-4F42-98E0-F5832A04C40B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>My13QuadTree</RootNamespace>
+    <RootNamespace>My15LodFix</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -141,20 +141,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Dib.cpp" />
-    <ClCompile Include="..\Common\ZCamera.cpp" />
-    <ClCompile Include="..\Common\ZFLog.cpp" />
-    <ClCompile Include="..\Common\ZFrustum.cpp" />
-    <ClCompile Include="13_main.cpp" />
+    <ClCompile Include="15_Main.cpp" />
+    <ClCompile Include="GlobalFunc.cpp" />
+    <ClCompile Include="ZCamera.cpp" />
+    <ClCompile Include="ZFLog.cpp" />
+    <ClCompile Include="ZFrustum.cpp" />
     <ClCompile Include="ZQuadTree.cpp" />
     <ClCompile Include="ZTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\define.h" />
     <ClInclude Include="..\Common\Dib.h" />
-    <ClInclude Include="..\Common\SAFE_DELETE.h" />
-    <ClInclude Include="..\Common\ZCamera.h" />
-    <ClInclude Include="..\Common\ZFLog.h" />
-    <ClInclude Include="..\Common\ZFrustum.h" />
+    <ClInclude Include="GlobalFunc.h" />
+    <ClInclude Include="ZCamera.h" />
+    <ClInclude Include="ZFLog.h" />
+    <ClInclude Include="ZFrustum.h" />
     <ClInclude Include="ZQuadTree.h" />
     <ClInclude Include="ZTerrain.h" />
   </ItemGroup>
