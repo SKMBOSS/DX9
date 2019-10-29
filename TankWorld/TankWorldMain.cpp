@@ -54,33 +54,25 @@ LPDIRECT3DTEXTURE9			g_pTexDiffuse2 = NULL;
 D3DXMATRIXA16				g_matAni;
 D3DXMATRIXA16				g_matAni2;
 D3DXMATRIXA16				g_matTankBox;
+D3DXMATRIXA16				g_matTankBoxRotate;
 
 DWORD						g_cxHeight = 0;
 DWORD						g_czHeight = 0;
 DWORD						g_dwMouseX = 0;
 DWORD						g_dwMouseY = 0;
 
-CUSTOMVERTEX3 CheckVertex = { 0,5.0f,-60.0f };
+CUSTOMVERTEX3 CheckVertex = { 0,100.0f,-50.0f };
+CUSTOMVERTEX3 CheckVertex2 = { 0,80.0f,-55.0f };
 vector<CUSTOMVERTEX3> mapVertex;
 
-void GetHegiht(CUSTOMVERTEX3* currentPos)
+void GetHegiht()
 {
-	float x = currentPos->x - 64;
-	float y = currentPos->z - 64;
+	int x = CheckVertex.x + 64;
+	int z = -1*CheckVertex.z + 64;
 
-	int size = mapVertex.size();
+	int c = 
 
-	for (int i = 0; i < size - 3; i += 3)
-	{
-		if ((mapVertex[i].x >= currentPos->x) && (mapVertex[i + 1].x <= currentPos->x) &&
-			(mapVertex[i].z >= currentPos->z) && (mapVertex[i + 2].z <= currentPos->z))
-		{
-			//ZFLog::GetInstance()->Log("FIND!!!!!");
-			ZFLog::GetInstance()->Log("x : %f", mapVertex[i].x);
-			currentPos->y = (mapVertex[i].y + mapVertex[i + 1].y + mapVertex[i + 2].y);
-			return;
-		}
-	}
+	CheckVertex.y = (mapVertex[z*g_cxHeight + x].y + mapVertex[z*g_cxHeight + x - 1].y + mapVertex[z*g_cxHeight + x + 1].y)/3.0f;
 }
 
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1)
@@ -218,9 +210,11 @@ HRESULT InitVB()
 			mapVertex.push_back(saveVertex);
 
 
-			//ZFLog::GetInstance()->Log("[%f ,%f ,%f]", v.p.x, v.p.y, v.p.z);
+			
 		}
 	}
+	/*for(auto iter = mapVertex.begin(); iter != mapVertex.end(); iter++)
+		ZFLog::GetInstance()->Log("[%f ,%f ,%f]", (*iter).x, (*iter).y, (*iter).z);*/
 
 	g_pVB->Unlock();
 	g_pTexHeight->UnlockRect(0);
@@ -325,7 +319,6 @@ void SetupCamera()
 	ZCamera::GetInstance()->SetView(&vEyePt, &vLookatPt, &vUpVec);
 }
 
-
 HRESULT InitGeometry()
 {
 	if (FAILED(InitTexture()))
@@ -346,6 +339,7 @@ HRESULT InitGeometry()
 
 	return S_OK;
 }
+
 void ProcessMouse()
 {
 	POINT pt;
@@ -357,6 +351,11 @@ void ProcessMouse()
 	ZCamera::GetInstance()->RotateLocalX(dy * fDelta);
 	ZCamera::GetInstance()->RotateLocalY(dx * fDelta);
 	D3DXMATRIXA16* pmatView = ZCamera::GetInstance()->GetViewMatrix();
+
+
+	D3DXMatrixRotationY(&g_matTankBoxRotate, dy * fDelta);
+
+
 	g_pd3dDevice->SetTransform(D3DTS_VIEW, pmatView);
 
 	RECT	rc;
@@ -375,11 +374,35 @@ void ProcessKey()
 	m_fElapseTime = sec.count();
 	m_LastTime = std::chrono::system_clock::now();
 
-	if (GetAsyncKeyState('A'))
-		ZCamera::GetInstance()->MoveLocalZ(0.5f);
+	if (GetAsyncKeyState('W'))
+	{
+		ZCamera::GetInstance()->MoveLocalZ(m_fElapseTime * 5.0f);
 
-	if (GetAsyncKeyState('Z'))
-		ZCamera::GetInstance()->MoveLocalZ(-0.5f);
+		float x = CheckVertex2.x;
+		float z = CheckVertex2.z;
+
+		CheckVertex2.x = ZCamera::GetInstance()->GetEye()->x;
+		CheckVertex2.z = ZCamera::GetInstance()->GetEye()->z;
+
+		CheckVertex.x += CheckVertex2.x - x;
+		CheckVertex.z += CheckVertex2.z - z;
+
+	}
+
+	if (GetAsyncKeyState('S'))
+	{
+		ZCamera::GetInstance()->MoveLocalZ(m_fElapseTime * -5.0f);
+
+		float x = CheckVertex2.x;
+		float z = CheckVertex2.z;
+
+		CheckVertex2.x = ZCamera::GetInstance()->GetEye()->x;
+		CheckVertex2.z = ZCamera::GetInstance()->GetEye()->z;
+
+		CheckVertex.x += CheckVertex2.x - x;
+		CheckVertex.z += CheckVertex2.z - z;
+
+	}
 
 	if (GetAsyncKeyState(VK_ESCAPE))
 		PostMessage(g_hWnd, WM_DESTROY, 0, 0);
@@ -479,13 +502,14 @@ VOID Animate()
 	g_matAni2._31 = ZCamera::GetInstance()->GetBillMatrix()->_31;
 	g_matAni2._33 = ZCamera::GetInstance()->GetBillMatrix()->_33;
 
-	D3DXMatrixIdentity(&g_matTankBox);
+	//D3DXMatrixIdentity(&g_matTankBox);
 
 
-	GetHegiht(&CheckVertex);
-	D3DXMatrixTranslation(&g_matTankBox, CheckVertex.x, CheckVertex.y, CheckVertex.z);
-
-
+	GetHegiht();
+	CheckVertex2.y = CheckVertex.y -3.0f;
+	D3DXMatrixTranslation(&g_matTankBox, CheckVertex.x, CheckVertex.y + 1.0f, CheckVertex.z);
+	D3DXVECTOR3 cPos = { CheckVertex2.x, CheckVertex2.y + 5.0f, CheckVertex2.z};
+	ZCamera::GetInstance()->MoveTo(&cPos);
 
 	LogFPS();
 
@@ -557,8 +581,8 @@ void Render()
 		DrawMesh(&g_matAni);
 
 		g_pd3dDevice->SetTexture(0, NULL);
-		DrawMesh3(&g_matTankBox);
-
+		D3DXMATRIXA16 matWorld = g_matTankBoxRotate * g_matTankBox;
+		DrawMesh3(&matWorld);
 		g_pd3dDevice->EndScene();
 	}
 
